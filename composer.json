@@ -3,13 +3,20 @@
     "type": "project",
     "require": {
         "slim/slim-skeleton": "^4.5",
-        "slim/php-view": "^3.4"
+        "slim/php-view": "^3.4",
+        "slim/slim": "^4.14",
+        "slim/flash": "^0.4.0",
+        "slim/http": "^1.4",
+        "slim/psr7": "^1.7",
+        "php-di/php-di": "^6.4",
+        "vlucas/valitron": "^1.4"
     },
     "license": "mit",
     "autoload": {
         "psr-4": {
-            "Anatoliyyushkevich\\PhpProject9\\": "public/"
+            "App\\": "public/"
         }
+
     },
     "minimum-stability": "alpha",
     "require-dev": {
