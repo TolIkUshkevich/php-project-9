@@ -43,26 +43,27 @@ class UrlRepository
         return null;
     }
 
-    public function findByUrl(string $urlName)
+    public function findByUrl(Url $url)
     {
+        $urlName = $url->getName();
         $sql = "SELECT * FROM urls WHERE name = ?";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$urlName]);
         if ($row = $stmt->fetch())  {
             $url = Url::fromArray($row);
-            return $url;
+            return true;
         }
 
         return false;
     }
 
-    public function exists($name) {
-        return $this->findByUrl($name) != null;
+    public function exists(Url $url) {
+        return $this->findByUrl($url) != null;
     }
 
     public function save(Url $url) {
-        if ($this->exists($url->getName())) {
-            // $this->update($url);
+        if ($this->exists($url)) {
+            $this->setExistsUrlData($url);
             return 'exists';
         } else {
             $this->create($url);
@@ -70,15 +71,12 @@ class UrlRepository
         }
     }
 
-    private function update(Url $url): void
+    private function setExistsUrlData(Url $url): void
     {
-        $sql = "UPDATE urls SET name = :name WHERE id = :id";
-        $stmt = $this->conn->prepare($sql);
-        $id = $url->getId();
-        $name = $url->getName();
-        $stmt->bindParam(':name', $name);
-        $stmt->bindParam(':id', $id);
-        $stmt->execute();
+        $urlData = $this->findByUrl($url);
+        $id = (int)[$urlData['id']];
+        $url->setId($id);
+        $url->setCreatedAt([$urlData['created_at']]);
     }
 
     private function create(Url $url): void

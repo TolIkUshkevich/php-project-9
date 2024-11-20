@@ -3,8 +3,8 @@
 namespace App;
 
 use Slim\Factory\AppFactory;
-use DI\Container;
 use Slim\Views\PhpRenderer;
+use DI\Container;
 use Slim\Flash\Messages;
 use PostgreSQLTutorial\Connection as Connection;
 use Valitron\Validator;
@@ -36,7 +36,17 @@ $repo = new UrlRepository($conn);
 
 
 $app->get('/', function ($request, $response) use ($renderer){
-    return $renderer->render($response, 'main.phtml');
+    if ($request->getParam('error') !== null) {
+        $error = $request->getParam('error');
+        $url = $request->getParam('url');
+        $params = [
+            'error' => $error,
+            'url' => $url
+        ];
+    } else {
+        $params = [];
+    }
+    return $renderer->render($response, 'main.phtml', $params);
 })->setName('main');
 
 $app->post('/urls', function ($request, $response) use ($repo, $router) {
@@ -52,21 +62,23 @@ $app->post('/urls', function ($request, $response) use ($repo, $router) {
     if ($validator->validate()) {
         $status = $repo->save($url);
         $message = $flashMap['new'];
-        $this->get('flash')->addMessage('new', 'aaaaaa');
-        var_dump($this->get('flash')->getMessages());
+        $this->get('flash')->addMessageNow($status, $message);
+        $a = $this->get('flash')->getMessages();
         $route = $router->urlFor('url', ['id' => $url->getId()], ['status' => $status]);
         return $response->withRedirect($route);
     } else {
-        var_dump($validator->errors());
+        $route = $router->urlFor('main', [], ['error' => 'error', 'url' => $url->getName()]);
+        return $response->withRedirect($route);
     }
 })->setName('post_url');
 
 $app->get('/urls/{id}', function ($request, $response, $args) use ($repo, $renderer){
-    $id = $args['id'];
+    $id = (int)$args['id'];
     $status = $request->getParam('status');
+    // $flash = $request->getParam('flash');
     $url = $repo->find($id);
-    $flash = $this->get('flash')->getMessage('new');
-    var_dump($this->get('flash')->getMessages());
+    $flash = $this->get('flash')->getMessage($status);
+    var_dump($flash);
     $params = [
         'url' => $url->toArray(),
         'flash' => $flash,
