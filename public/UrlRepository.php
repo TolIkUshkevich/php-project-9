@@ -2,6 +2,8 @@
 
 namespace App;
 
+use Carbon\Carbon;
+
 class UrlRepository
 {
     private \PDO $conn;
@@ -16,14 +18,14 @@ class UrlRepository
     //     return $lastUrl->setCreatedAt();
     // }
 
-    public function getEntities(): array
+    public function getUrls(): array
     {
         $urls = [];
         $sql = "SELECT * FROM urls";
         $stmt = $this->conn->query($sql);
 
         while ($row = $stmt->fetch()) {
-            $url = new Url([$row['id'], $row['url']]);
+            $url = Url::fromArray($row);
             $urls[] = $url;
         }
 
@@ -50,15 +52,14 @@ class UrlRepository
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$urlName]);
         if ($row = $stmt->fetch())  {
-            $url = Url::fromArray($row);
-            return true;
+            return $row;
         }
 
         return false;
     }
 
     public function exists(Url $url) {
-        return $this->findByUrl($url) != null;
+        return $this->findByUrl($url) !== false;
     }
 
     public function save(Url $url) {
@@ -74,9 +75,10 @@ class UrlRepository
     private function setExistsUrlData(Url $url): void
     {
         $urlData = $this->findByUrl($url);
-        $id = (int)[$urlData['id']];
+        $id = (int)$urlData['id'];
+        $created_at = $urlData['created_at'];
         $url->setId($id);
-        $url->setCreatedAt([$urlData['created_at']]);
+        $url->setCreatedAt($created_at);
     }
 
     private function create(Url $url): void
@@ -88,5 +90,6 @@ class UrlRepository
         $stmt->execute([$name]);
         $id = (int) $this->conn->lastInsertId();
         $url->setId($id);
+        $url->setCreatedAt(Carbon::now());
     }
 }

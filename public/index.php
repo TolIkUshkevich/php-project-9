@@ -20,8 +20,7 @@ $container->set(\PDO::class, function () {
     return $conn;
 });
 $container->set('flash', function () {
-    $storage = [];
-    return new Messages($storage    );
+    return new Messages();
 });
 
 $app = AppFactory::createFromContainer($container);
@@ -33,7 +32,7 @@ $initSql = file_get_contents($initFilePath);
 $container->get(\PDO::class)->exec($initSql);
 $conn = $container->get(\PDO::class);
 $repo = new UrlRepository($conn);
-
+$checkRepo = new CheckRepository($conn);
 
 $app->get('/', function ($request, $response) use ($renderer){
     if ($request->getParam('error') !== null) {
@@ -49,6 +48,14 @@ $app->get('/', function ($request, $response) use ($renderer){
     return $renderer->render($response, 'main.phtml', $params);
 })->setName('main');
 
+$app->get('/urls', function ($request, $response) use ($repo, $renderer ) {
+    $urls = $repo->getUrls();
+    $params = [
+        'urls' => $urls
+    ];
+    return $renderer->render($response, 'urls.phtml', $params);
+})->setName('urls');
+
 $app->post('/urls', function ($request, $response) use ($repo, $router) {
     $flashMap = [
         'new' => 'Страница успешно добавлена',
@@ -62,9 +69,8 @@ $app->post('/urls', function ($request, $response) use ($repo, $router) {
     if ($validator->validate()) {
         $status = $repo->save($url);
         $message = $flashMap['new'];
-        $this->get('flash')->addMessageNow($status, $message);
-        $a = $this->get('flash')->getMessages();
-        $route = $router->urlFor('url', ['id' => $url->getId()], ['status' => $status]);
+        $this->get('flash')->addMessage('success', $message);
+        $route = $router->urlFor('url', ['id' => $url->getId()]);
         return $response->withRedirect($route);
     } else {
         $route = $router->urlFor('main', [], ['error' => 'error', 'url' => $url->getName()]);
@@ -72,19 +78,40 @@ $app->post('/urls', function ($request, $response) use ($repo, $router) {
     }
 })->setName('post_url');
 
-$app->get('/urls/{id}', function ($request, $response, $args) use ($repo, $renderer){
-    $id = (int)$args['id'];
-    $status = $request->getParam('status');
-    // $flash = $request->getParam('flash');
+$app->post('/urls/{id}/checks', function ($request, $response, $args) use ($repo, $checkRepo, $router) {
+    $check = new Check();
+    $id = $args['id'];
     $url = $repo->find($id);
-    $flash = $this->get('flash')->getMessage($status);
-    var_dump($flash);
+    $checkStatus = $check->check($url);
+    if ($checkStatus) {
+        $checkRepo->create($check);
+        $this->get('flash')->addMessage('success', 'Страница успешно проверена');
+    } else {
+        $this->get('flash')->addMessage('error', 'Произошла ошибка при проверке, не удалось подключиться');
+    }
+    $route = $router->urlFor('url', ['id' => $id]);
+    return $response->withRedirect($route);
+});
+
+$app->get('/urls/{id}', function ($request, $response, $args) use ($repo, $renderer, $checkRepo){
+    $id = (int)$args['id'];
+    $url = $repo->find($id);
+    if ($this->get('flash')->getMessage('success') !== null) {
+        $flash = $this->get('flash')->getMessage('success');
+        $status = 'success';
+    } else {
+        $flash = $this->get('flash')->getMessage('error');
+        $status = 'error';
+    }
+    $checks = $checkRepo->getChecksForUrl($url);    
     $params = [
-        'url' => $url->toArray(),
+        'url' => $url,
         'flash' => $flash,
-        'status' => $status
+        'status' => $status,
+        'checks' => $checks
     ];
-    return $renderer->render($response, 'urls.phtml', $params);
+    return $renderer->render($response, 'url.phtml', $params);
 })->setName('url');
+
 
 $app->run();
