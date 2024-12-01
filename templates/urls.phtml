@@ -45,7 +45,9 @@
       </tr>
     </thead>
     <tbody>
-        <?php foreach ($urls as $url) { ?>
+        <?php foreach ($urlsWithChecks as $data) : ?>
+            <?php $url = $data['url'] ?>
+            <?php $check = $data['check'] ?>
             <tr>
                 <td><?= $url->getId() ?></td>
                 <td>
@@ -53,10 +55,10 @@
                     <?= $url->getName() ?>
                     </a>
                 </td>
-                <td></td>
-                <td></td>
+                <td><?= $check->getCreatedAt() ?></td>
+                <td><?= $check->getStatusCode() ?></td>
             </tr>
-            <?php } ?>
+            <?php endforeach ?>
         </tbody>
   </table>
 </div>

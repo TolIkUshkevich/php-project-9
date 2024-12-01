@@ -26,16 +26,10 @@
             </div>
         </nav>
     </header>
+    
 
     <?php if ($flash !== null): ?>
-        <?php if ($status === 'success') : ?>
-            <div class="alert alert-success" role="alert">
-        <?php endif ?>
-        <?php if ($status === 'error') : ?>
-            <div class="alert alert-danger" role="alert">
-        <?php endif ?>
         <?= $flash[0] ?>
-    </div>
     <?php endif ?>
   
 

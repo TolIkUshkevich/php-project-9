@@ -48,18 +48,19 @@ $app->get('/', function ($request, $response) use ($renderer){
     return $renderer->render($response, 'main.phtml', $params);
 })->setName('main');
 
-$app->get('/urls', function ($request, $response) use ($repo, $renderer ) {
+$app->get('/urls', function ($request, $response) use ($repo, $renderer, $checkRepo) {
     $urls = $repo->getUrls();
+    $urlsWithChecks = $checkRepo->getLastChecks($urls);
     $params = [
-        'urls' => $urls
+        'urlsWithChecks' => $urlsWithChecks
     ];
     return $renderer->render($response, 'urls.phtml', $params);
 })->setName('urls');
 
-$app->post('/urls', function ($request, $response) use ($repo, $router) {
+$app->post('/urls', function ($request, $response) use ($repo, $router, $renderer) {
     $flashMap = [
-        'new' => 'Страница успешно добавлена',
-        'exists' => 'Страница уже существует'
+        'new' => '<div class="alert alert-success" role="alert">Страница успешно добавлена</div>',
+        'exists' => '<div class="alert alert-success" role="alert">Страница уже существует</div>'
     ];
     $formData = $request->getParsedBody();
     $urlData = $formData['url'];
@@ -68,46 +69,57 @@ $app->post('/urls', function ($request, $response) use ($repo, $router) {
     $validator->rule('url', 'name');
     if ($validator->validate()) {
         $status = $repo->save($url);
-        $message = $flashMap['new'];
-        $this->get('flash')->addMessage('success', $message);
+        $message = $flashMap[$status];
+        $this->get('flash')->addMessage('processing_success', $message);
         $route = $router->urlFor('url', ['id' => $url->getId()]);
         return $response->withRedirect($route);
     } else {
-        $route = $router->urlFor('main', [], ['error' => 'error', 'url' => $url->getName()]);
-        return $response->withRedirect($route);
+        $params = [
+            'error' => 'wrong url',
+            'url' => $url
+        ];
+        // $route = $router->urlFor('main', [], ['error' => 'error', 'url' => $url->getName()]);
+        return $renderer->render($response, 'main.phtml', $params);
     }
 })->setName('post_url');
 
 $app->post('/urls/{id}/checks', function ($request, $response, $args) use ($repo, $checkRepo, $router) {
+    $map = [
+        'check_success' => '<div class="alert alert-success" role="alert">Страница успешно проверена</div>',
+        'check_error' => '<div class="alert alert-warning" role="alert">Проверка была выполнена успешно, но сервер ответил с ошибкой</div>',
+        'url_error' => '<div class="alert alert-danger" role="alert">Произошла ошибка при проверке, не удалось подключиться</div>'
+    ];
     $check = new Check();
     $id = $args['id'];
     $url = $repo->find($id);
     $checkStatus = $check->check($url);
-    if ($checkStatus) {
+    if ($checkStatus === 'check_success') {
         $checkRepo->create($check);
-        $this->get('flash')->addMessage('success', 'Страница успешно проверена');
-    } else {
-        $this->get('flash')->addMessage('error', 'Произошла ошибка при проверке, не удалось подключиться');
     }
+    $this->get('flash')->addMessage($checkStatus, $map[$checkStatus]);
     $route = $router->urlFor('url', ['id' => $id]);
     return $response->withRedirect($route);
 });
 
 $app->get('/urls/{id}', function ($request, $response, $args) use ($repo, $renderer, $checkRepo){
+    $flashKeys = [
+        'check_success',
+        'check_error',
+        'url_error',
+        'processing_success'
+    ];
     $id = (int)$args['id'];
     $url = $repo->find($id);
-    if ($this->get('flash')->getMessage('success') !== null) {
-        $flash = $this->get('flash')->getMessage('success');
-        $status = 'success';
-    } else {
-        $flash = $this->get('flash')->getMessage('error');
-        $status = 'error';
+    $flash = null;
+    foreach ($flashKeys as $key) {
+        if ($this->get('flash')->getMessage($key)) {
+            $flash = $this->get('flash')->getMessage($key);
+        }
     }
     $checks = $checkRepo->getChecksForUrl($url);    
     $params = [
         'url' => $url,
         'flash' => $flash,
-        'status' => $status,
         'checks' => $checks
     ];
     return $renderer->render($response, 'url.phtml', $params);

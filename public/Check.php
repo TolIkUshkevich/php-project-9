@@ -4,6 +4,7 @@ namespace App;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
+use DiDom\Document;
 
 class Check {
     private $client;
@@ -20,15 +21,29 @@ class Check {
         $this->client = new Client(['base_uri' => '']);
     }
 
-    public static function fromArray(array $params) {
+    public static function fromArray(array|false $params) {
+        $map = [
+            'id' => fn($check, $id) => $check->setId($id),
+            'url_id' => fn($check, $urlId) => $check->setUrlId($urlId),
+            'h1' => fn($check, $h1) => $check->setH1($h1),
+            'status_code' => fn($check, $statusCode) => $check->setStatusCode($statusCode),
+            'description' => fn($check, $description) => $check->setDescription($description),
+            'title' => fn($check, $title) => $check->setTitle($title),
+            'created_at' => fn($check, $createdAt) => $check->setCreatedAt($createdAt)
+        ];
+
         $check = new Check();
-        $check->setId($params['id']);
-        $check->setUrlId($params['url_id']);
-        $check->setH1($params['h1']);
-        $check->setStatusCode($params['status_code']);
-        $check->setDescription($params['description']);
-        $check->setTitle($params['title']);
-        $check->setCreatedAt($params['created_at']);
+
+        if (!$params) {
+            return $check;
+        }
+
+        foreach ($params as $key => $value) {
+            if (array_key_exists($key, $map)) {
+                $map[$key]($check, $value);
+            }
+        }
+
         return $check;
     }
 
@@ -100,21 +115,26 @@ class Check {
         $name = $url->getName();
         try {
             $response = $this->client->get($name);
-            $urlId = $url->getId();
-            $h1 = $response->getHeaders();
-            $statusCode = $response->getStatusCode();
             $body = $response->getBody();
-            preg_match('/(?<=<title>)(.|\n)*?(?=<\/title>)/', $body, $title);
-            preg_match('/(?<=<body>)(.|\n)*?(?=<\/body>)/', $body, $description);
+            $document = new Document((string)$body);
+            $urlId = $url->getId();
+            $statusCode = $response->getStatusCode();
+            $h1 = optional($document->first('h1'))->text();
+            $title = optional($document->first('title'))->text();
+            $description = optional($document->xpath("//meta[@name='description']/@content"))[0];
+            // var_dump($description);
+            // die;
             $this->setUrlId($urlId);
             $this->setH1($h1);
             $this->setBody(htmlspecialchars($body));
-            $this->setStatusCode($statusCode);
-            $this->setDescription($description[0]);
-            $this->setTitle($title[0]);
-            return true;
+            $this->setStatusCode((int)$statusCode);
+            $this->setDescription($description);
+            $this->setTitle($title);
+            return 'check_success';
+        } catch (\GuzzleHttp\Exception\ClientException) {
+            return 'check_error';
         } catch (\GuzzleHttp\Exception\ConnectException) {
-            return false;
+            return 'url_error';
         }
     }
 }

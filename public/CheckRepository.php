@@ -59,4 +59,18 @@ class CheckRepository {
         return null;
     }
 
+    public function getLastChecks(array $urls) {
+        $urlsWithChecks =[];
+        foreach ($urls as $url) {
+            $urlId = $url->getId();
+            $sql = "SELECT * FROM url_checks WHERE url_id = ? ORDER BY id DESC LIMIT 1";
+            $stmt = $this->conn->prepare($sql);
+            $stmt->execute([$urlId]);
+            $checkData = $stmt->fetch();
+            $check = Check::fromArray($checkData);
+            $urlsWithChecks[] = ['url' => $url, 'check' => $check];
+        }
+        return $urlsWithChecks; 
+    }
+
 }
