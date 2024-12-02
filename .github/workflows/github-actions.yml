@@ -3,31 +3,31 @@ on:
   push:
     branches:
       - mainjobs:
-        Linter:
-          runs-on: ubuntu-latest
-          steps:
-            - name: Check out repository code
-              uses: actions/checkout@v4
-            - run: make lint
-            - name: List files in the repository
-              run: |
-                ls ${{ github.workspace }}
-            - run: echo "This job's status is ${{ job.status }}."
-        Tests:
+          Linter:
+            runs-on: ubuntu-latest
             steps:
-            - name: Check out repository code
-              uses: actions/checkout@v4
-            - run: make test
-            - name: List files in the repository
-              run: |
-                ls ${{ github.workspace }}
-            - run: echo "This job's status is ${{ job.status }}."
-            - name: Run test & publish code coverage
-              uses: paambaati/codeclimate-action@v5
-              env:
-                CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-              with:
-                coverageCommand: make test-coverage
-                coverageLocations: build/logs/clover.xml:clover
+              - name: Check out repository code
+                uses: actions/checkout@v4
+              - run: make lint
+              - name: List files in the repository
+                run: |
+                  ls ${{ github.workspace }}
+              - run: echo "This job's status is ${{ job.status }}."
+          Tests:
+              steps:
+              - name: Check out repository code
+                uses: actions/checkout@v4
+              - run: make test
+              - name: List files in the repository
+                run: |
+                  ls ${{ github.workspace }}
+              - run: echo "This job's status is ${{ job.status }}."
+              - name: Run test & publish code coverage
+                uses: paambaati/codeclimate-action@v5
+                env:
+                  CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+                with:
+                  coverageCommand: make test-coverage
+                  coverageLocations: build/logs/clover.xml:clover
                 debug: true
             
