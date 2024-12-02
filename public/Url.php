@@ -16,14 +16,14 @@ class Url {
 
     public function toArray() {
         return [
-            'name' => $this->getName(),
             'id' => $this->getId(),
+            'name' => $this->getName(),
             'created_at' => $this->getCreatedAt()
         ];
     }
 
-    public function __construct($url) {
-        $this->name = $url;
+    public function __construct($name) {
+        $this->name = $name;
     }
 
     public function setId($id) {

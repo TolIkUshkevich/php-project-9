@@ -13,11 +13,6 @@ class UrlRepository
         $this->conn = $conn;
     }
 
-    // private function getLastCreatedAt(Url $url) {
-    //     $lastUrl = $this->find((int) $this->conn->lastInsertId());
-    //     return $lastUrl->setCreatedAt();
-    // }
-
     public function getUrls(): array
     {
         $urls = [];
@@ -26,6 +21,8 @@ class UrlRepository
 
         while ($row = $stmt->fetch()) {
             $url = Url::fromArray($row);
+            var_dump($url);
+            die;
             $urls[] = $url;
         }
 

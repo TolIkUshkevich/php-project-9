@@ -2,14 +2,40 @@ name: GitHub Actions Demo
 run-name: ${{ github.actor }} is testing out GitHub Actions
 on: [push]
 jobs:
-  Explore-GitHub-Actions:
+  Linter:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
       - run: make lint
+      - name: List files in the repository
+        run: |
+          ls ${{ github.workspace }}
+      - run: echo "This job's status is ${{ job.status }}."
+  Tests:
+      steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
       - run: make test
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
       - run: echo "This job's status is ${{ job.status }}."
+  Code-Coverege:
+    needs: [ test ]
+      name: coverage
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@master
+        with:
+          node-version: '12'
+      - run: npm install -g yarn
+      - run: yarn install
+      - run: yarn build
+      - uses: paambaati/codeclimate-action@v2.2.4
+        env:
+          CC_TEST_REPORTER_ID: ${{secrets. CC_TEST_REPORTER_ID}}
+        with:
+          coverageCommand: yarn coverage
+      
