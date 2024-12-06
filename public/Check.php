@@ -75,7 +75,7 @@ class Check
         $this->h1 = $h1;
     }
 
-    public function getH1(): string
+    public function getH1(): string | null
     {
         return $this->h1;
     }
@@ -85,7 +85,7 @@ class Check
         $this->body = $body;
     }
 
-    public function getBody(): string
+    public function getBody(): string | null
     {
         return $this->body;
     }
@@ -95,7 +95,7 @@ class Check
         $this->statusCode = $statusCode;
     }
 
-    public function getStatusCode(): int
+    public function getStatusCode(): int | null
     {
         return $this->statusCode;
     }
@@ -126,7 +126,7 @@ class Check
         $this->createdAt = $createdAt;
     }
 
-    public function getCreatedAt(): string
+    public function getCreatedAt(): string | null
     {
         return $this->createdAt;
     }
@@ -149,11 +149,11 @@ class Check
             $this->setStatusCode((int)$statusCode);
             $this->setDescription($description);
             $this->setTitle($title);
-            return 'check_success';
+            return 'success';
         } catch (\GuzzleHttp\Exception\ClientException) {
-            return 'check_error';
+            return 'warning';
         } catch (\GuzzleHttp\Exception\ConnectException) {
-            return 'url_error';
+            return 'danger';
         }
     }
 }

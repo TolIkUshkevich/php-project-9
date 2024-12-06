@@ -57,10 +57,10 @@ $app->get('/urls', function ($request, $response) use ($repo, $renderer, $checkR
     return $renderer->render($response, 'urls.phtml', $params);
 })->setName('urls');
 
-$app->post('/urls', function ($request, $response) use ($repo, $router, $renderer) {
+$app->post('/urls', function ($request, $response) use ($repo, $router, $renderer, $app) {
     $flashMap = [
-        'new' => '<div class="alert alert-success" role="alert">Страница успешно добавлена</div>',
-        'exists' => '<div class="alert alert-success" role="alert">Страница уже существует</div>'
+        'new' => 'Страница успешно добавлена',
+        'exists' => 'Страница уже существует'
     ];
     $formData = $request->getParsedBody();
     $urlData = $formData['url'];
@@ -70,7 +70,7 @@ $app->post('/urls', function ($request, $response) use ($repo, $router, $rendere
     if ($validator->validate()) {
         $status = $repo->save($url);
         $message = $flashMap[$status];
-        $this->get('flash')->addMessage('processing_success', $message);
+        $this->get('flash')->addMessage('success', $message);
         $route = $router->urlFor('url', ['id' => $url->getId()]);
         return $response->withRedirect($route);
     } else {
@@ -82,17 +82,17 @@ $app->post('/urls', function ($request, $response) use ($repo, $router, $rendere
     }
 })->setName('post_url');
 
-$app->post('/urls/{id}/checks', function ($request, $response, $args) use ($repo, $checkRepo, $router) {
+$app->post('/urls/{id}/checks', function ($request, $response, $args) use ($repo, $checkRepo, $router, $app) {
     $map = [
-        'check_success' => '<div class="alert alert-success" role="alert">Страница успешно проверена</div>',
-        'check_error' => '<div class="alert alert-warning" role="alert">Проверка была выполнена успешно, но сервер ответил с ошибкой</div>',
-        'url_error' => '<div class="alert alert-danger" role="alert">Произошла ошибка при проверке, не удалось подключиться</div>'
+        'success' => 'Страница успешно проверена',
+        'warning' => 'Проверка была выполнена успешно, но сервер ответил с ошибкой',
+        'danger' => 'Произошла ошибка при проверке, не удалось подключиться'
     ];
     $check = new Check();
     $id = $args['id'];
     $url = $repo->find($id);
     $checkStatus = $check->check($url);
-    if ($checkStatus === 'check_success') {
+    if ($checkStatus === 'success') {
         $checkRepo->create($check);
     }
     $this->get('flash')->addMessage($checkStatus, $map[$checkStatus]);
@@ -100,19 +100,18 @@ $app->post('/urls/{id}/checks', function ($request, $response, $args) use ($repo
     return $response->withRedirect($route);
 });
 
-$app->get('/urls/{id}', function ($request, $response, $args) use ($repo, $renderer, $checkRepo) {
+$app->get('/urls/{id}', function ($request, $response, $args) use ($repo, $renderer, $checkRepo, $app) {
     $flashKeys = [
-        'check_success',
-        'check_error',
-        'url_error',
-        'processing_success'
+        'success',
+        'warning',
+        'danger'
     ];
     $id = (int)$args['id'];
     $url = $repo->find($id);
     $flash = null;
     foreach ($flashKeys as $key) {
         if ($this->get('flash')->getMessage($key)) {
-            $flash = $this->get('flash')->getMessage($key);
+            $flash = [$key, ...$this->get('flash')->getMessage($key)];
         }
     }
     $checks = $checkRepo->getChecksForUrl($url);

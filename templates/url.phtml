@@ -29,7 +29,7 @@
     
 
     <?php if ($flash !== null): ?>
-        <?= $flash[0] ?>
+        <div class="alert alert-<?= $flash[0] ?>" role="alert"><?= $flash[1] ?></div>
     <?php endif ?>
   
 

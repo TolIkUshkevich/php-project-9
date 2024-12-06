@@ -21,8 +21,6 @@ class UrlRepository
 
         while ($row = $stmt->fetch()) {
             $url = Url::fromArray($row);
-            var_dump($url);
-            die;
             $urls[] = $url;
         }
 
@@ -52,12 +50,12 @@ class UrlRepository
             return $row;
         }
 
-        return false;
+        return null;
     }
 
     public function exists(Url $url): bool
     {
-        return $this->findByUrl($url);
+        return $this->findByUrl($url) !== null;
     }
 
     public function save(Url $url): string
