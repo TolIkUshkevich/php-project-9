@@ -4,7 +4,8 @@ namespace App;
 
 use Carbon\Carbon;
 
-class CheckRepository {
+class CheckRepository
+{
     private \PDO $conn;
 
     public function __construct(\PDO $conn)
@@ -12,7 +13,8 @@ class CheckRepository {
         $this->conn = $conn;
     }
 
-    public function getChecksForUrl(Url $url) {
+    public function getChecksForUrl(Url $url): array
+    {
         $checks = [];
         $sql = "SELECT * FROM url_checks WHERE url_id = :url_id";
         $stmt = $this->conn->prepare($sql);
@@ -20,15 +22,14 @@ class CheckRepository {
         $stmt->bindParam(':url_id', $urlId);
         $stmt->execute();
         while ($row = $stmt->fetch()) {
-            // var_dump($row);
-            // die;
             $checks[] = Check::fromarray($row);
         }
 
         return $checks;
     }
 
-    public function create(Check $check) {
+    public function create(Check $check): void
+    {
         $sql = "INSERT INTO url_checks (url_id, status_code, h1, title, description, created_at) VALUES (:url_id, :status_code, :h1, :title, :description, NOW())";
         $stmt = $this->conn->prepare($sql);
         $urlId = $check->getUrlId();
@@ -47,11 +48,12 @@ class CheckRepository {
         $check->setCreatedAt(Carbon::now());
     }
 
-    public function find(int $id) {
+    public function find(int $id): Check
+    {
         $sql = "SELECT * FROM url_checks WHERE id = ?";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$id]);
-        if ($row = $stmt->fetch())  {
+        if ($row = $stmt->fetch()) {
             $url = Check::fromArray($row);
             return $url;
         }
@@ -59,8 +61,9 @@ class CheckRepository {
         return null;
     }
 
-    public function getLastChecks(array $urls) {
-        $urlsWithChecks =[];
+    public function getChecks(array $urls): array
+    {
+        $urlsWithChecks = [];
         foreach ($urls as $url) {
             $urlId = $url->getId();
             $sql = "SELECT * FROM url_checks WHERE url_id = ? ORDER BY id DESC LIMIT 1";
@@ -70,7 +73,6 @@ class CheckRepository {
             $check = Check::fromArray($checkData);
             $urlsWithChecks[] = ['url' => $url, 'check' => $check];
         }
-        return $urlsWithChecks; 
+        return $urlsWithChecks;
     }
-
 }

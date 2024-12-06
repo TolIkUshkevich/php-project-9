@@ -6,7 +6,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use DiDom\Document;
 
-class Check {
+class Check
+{
     private $client;
     private $id;
     private $urlId;
@@ -17,11 +18,13 @@ class Check {
     private $title;
     private $createdAt;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->client = new Client(['base_uri' => '']);
     }
 
-    public static function fromArray(array|false $params) {
+    public static function fromArray(array|false $params): check
+    {
         $map = [
             'id' => fn($check, $id) => $check->setId($id),
             'url_id' => fn($check, $urlId) => $check->setUrlId($urlId),
@@ -47,71 +50,89 @@ class Check {
         return $check;
     }
 
-    public function setId($id) {
+    public function setId($id): void
+    {
         $this->id = $id;
     }
 
-    public function getId() {
+    public function getId(): int
+    {
         return $this->id;
     }
 
-    public function setUrlId($urlId) {
+    public function setUrlId($urlId): void
+    {
         $this->urlId = $urlId;
     }
 
-    public function getUrlId() {
+    public function getUrlId(): string
+    {
         return $this->urlId;
     }
 
-    public function setH1($h1) {
+    public function setH1($h1): void
+    {
         $this->h1 = $h1;
     }
 
-    public function getH1() {
+    public function getH1(): string
+    {
         return $this->h1;
     }
 
-    public function setBody($body) {
+    public function setBody($body): void
+    {
         $this->body = $body;
     }
 
-    public function getBody() {
+    public function getBody(): string
+    {
         return $this->body;
     }
 
-    public function setStatusCode($statusCode) {
+    public function setStatusCode($statusCode): void
+    {
         $this->statusCode = $statusCode;
     }
 
-    public function getStatusCode() {
+    public function getStatusCode(): int
+    {
         return $this->statusCode;
     }
 
-    public function setDescription($description) {
+    public function setDescription($description): void
+    {
         $this->description = $description;
     }
 
-    public function getDescription() {
+    public function getDescription(): string
+    {
+
         return $this->description;
     }
 
-    public function setTitle($title) {
+    public function setTitle($title): void
+    {
         $this->title = $title;
     }
 
-    public function getTitle() {
+    public function getTitle(): string
+    {
         return $this->title;
     }
 
-    public function setCreatedAt($createdAt) {
+    public function setCreatedAt($createdAt): void
+    {
         $this->createdAt = $createdAt;
     }
 
-    public function getCreatedAt() {
+    public function getCreatedAt(): string
+    {
         return $this->createdAt;
     }
-    
-    public function check(Url $url) {
+
+    public function check(Url $url): string
+    {
         $name = $url->getName();
         try {
             $response = $this->client->get($name);
@@ -122,8 +143,6 @@ class Check {
             $h1 = optional($document->first('h1'))->text();
             $title = optional($document->first('title'))->text();
             $description = optional($document->xpath("//meta[@name='description']/@content"))[0];
-            // var_dump($description);
-            // die;
             $this->setUrlId($urlId);
             $this->setH1($h1);
             $this->setBody(htmlspecialchars($body));

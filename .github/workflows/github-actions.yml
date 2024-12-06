@@ -3,21 +3,19 @@ on:
   push:
     branches:
       - '**'
-    tags:
-      - '**'
 jobs:
-  build:
+  Linter:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-      - run: composer install
-      - run: make test
+      - name: Check out repository code
+        uses: actions/checkout@v4
       - run: make lint
-      - name: Run test & publish code coverage
+      - name: List files in the repository
+        run: |
+          ls ${{ github.workspace }}
+      - run: echo "This job's status is ${{ job.status }}."
+  CodeCoverage:
+      steps:
         uses: paambaati/codeclimate-action@v5
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
@@ -25,4 +23,4 @@ jobs:
           coverageCommand: make test-coverage
           coverageLocations: build/logs/clover.xml:clover
           debug: true
-      
+            

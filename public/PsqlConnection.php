@@ -2,7 +2,8 @@
 
 namespace App;
 
-class PsqlConnection {
+class PsqlConnection
+{
     /**
      * Connection
      * @var type
@@ -13,30 +14,23 @@ class PsqlConnection {
      * @return \PDO
      * @throws \Exception
      */
-    public function connect() {
+    public function connect(): \PDO
+    {
         $databaseUrl = parse_url(getenv('DATABASE_URL'));
         // var_dump(getenv('DATABASE_URL'));
         if ($databaseUrl === false) {
             throw new \Exception("Error reading database configuration file");
         }
-        $conStr = sprintf("pgsql:host=%s;port=%d;dbname=%s;user=%s;password=%s",
-                $databaseUrl['host'],
-                $databaseUrl['port'],
-                ltrim($databaseUrl['path'], '/'),
-                $databaseUrl['user'],
-                $databaseUrl['pass']);
+        $conStr = sprintf(
+            "pgsql:host=%s;port=%d;dbname=%s;user=%s;password=%s",
+            $databaseUrl['host'],
+            $databaseUrl['port'],
+            ltrim($databaseUrl['path'], '/'),
+            $databaseUrl['user'],
+            $databaseUrl['pass']
+        );
         $pdo = new \PDO($conStr);
         $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         return $pdo;
-    }
-    /**
-     * return an instance of the Connection object
-     * @return type
-     */
-    public static function get() {
-        if (null === static::$conn) {
-            static::$conn = new static();
-        }
-        return static::$conn;
     }
 }

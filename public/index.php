@@ -15,7 +15,7 @@ session_start();
 
 $container = new Container();
 $container->set(\PDO::class, function () {
-    $connecter = new PsqlConnection;
+    $connecter = new PsqlConnection();
     $conn = $connecter->connect();
     return $conn;
 });
@@ -34,7 +34,7 @@ $conn = $container->get(\PDO::class);
 $repo = new UrlRepository($conn);
 $checkRepo = new CheckRepository($conn);
 
-$app->get('/', function ($request, $response) use ($renderer){
+$app->get('/', function ($request, $response) use ($renderer) {
     if ($request->getParam('error') !== null) {
         $error = $request->getParam('error');
         $url = $request->getParam('url');
@@ -50,7 +50,7 @@ $app->get('/', function ($request, $response) use ($renderer){
 
 $app->get('/urls', function ($request, $response) use ($repo, $renderer, $checkRepo) {
     $urls = $repo->getUrls();
-    $urlsWithChecks = $checkRepo->getLastChecks($urls);
+    $urlsWithChecks = $checkRepo->getChecks($urls);
     $params = [
         'urlsWithChecks' => $urlsWithChecks
     ];
@@ -78,7 +78,6 @@ $app->post('/urls', function ($request, $response) use ($repo, $router, $rendere
             'error' => 'wrong url',
             'url' => $url
         ];
-        // $route = $router->urlFor('main', [], ['error' => 'error', 'url' => $url->getName()]);
         return $renderer->render($response, 'main.phtml', $params);
     }
 })->setName('post_url');
@@ -101,7 +100,7 @@ $app->post('/urls/{id}/checks', function ($request, $response, $args) use ($repo
     return $response->withRedirect($route);
 });
 
-$app->get('/urls/{id}', function ($request, $response, $args) use ($repo, $renderer, $checkRepo){
+$app->get('/urls/{id}', function ($request, $response, $args) use ($repo, $renderer, $checkRepo) {
     $flashKeys = [
         'check_success',
         'check_error',
@@ -116,7 +115,7 @@ $app->get('/urls/{id}', function ($request, $response, $args) use ($repo, $rende
             $flash = $this->get('flash')->getMessage($key);
         }
     }
-    $checks = $checkRepo->getChecksForUrl($url);    
+    $checks = $checkRepo->getChecksForUrl($url);
     $params = [
         'url' => $url,
         'flash' => $flash,

@@ -29,12 +29,12 @@ class UrlRepository
         return $urls;
     }
 
-    public function find(int $id)
+    public function find(int $id): Url | null
     {
         $sql = "SELECT * FROM urls WHERE id = ?";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$id]);
-        if ($row = $stmt->fetch())  {
+        if ($row = $stmt->fetch()) {
             $url = Url::fromArray($row);
             return $url;
         }
@@ -42,24 +42,26 @@ class UrlRepository
         return null;
     }
 
-    public function findByUrl(Url $url)
+    public function findByUrl(Url $url): array | false
     {
         $urlName = $url->getName();
         $sql = "SELECT * FROM urls WHERE name = ?";
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([$urlName]);
-        if ($row = $stmt->fetch())  {
+        if ($row = $stmt->fetch()) {
             return $row;
         }
 
         return false;
     }
 
-    public function exists(Url $url) {
-        return $this->findByUrl($url) !== false;
+    public function exists(Url $url): bool
+    {
+        return $this->findByUrl($url);
     }
 
-    public function save(Url $url) {
+    public function save(Url $url): string
+    {
         if ($this->exists($url)) {
             $this->setExistsUrlData($url);
             return 'exists';
