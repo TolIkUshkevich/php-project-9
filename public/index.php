@@ -108,12 +108,12 @@ $app->get('/urls/{id}', function ($request, $response, $args) use ($repo, $rende
     ];
     $id = (int)$args['id'];
     $url = $repo->find($id);
-    $flash = null;
-    foreach ($flashKeys as $key) {
-        if ($this->get('flash')->getMessage($key)) {
-            $flash = [$key, ...$this->get('flash')->getMessage($key)];
-        }
-    }
+    $flash = $this->get('flash')->getMessages();
+    // foreach ($flashKeys as $key) {
+    //     if ($this->get('flash')->getMessage($key)) {
+    //         $flash = [$key, ...$this->get('flash')->getMessage($key)];
+    //     }
+    // }
     $checks = $checkRepo->getChecksForUrl($url);
     $params = [
         'url' => $url,
