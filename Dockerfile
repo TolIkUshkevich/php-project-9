@@ -14,4 +14,4 @@ COPY . .
 
 RUN composer install
 
-CMD ["make install"]
+CMD ["bash", "-c", "make start"]
