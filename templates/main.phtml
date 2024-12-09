@@ -40,7 +40,7 @@
     <div class="col-12 col-md-10 col-lg-8 mx-auto border rounded-3 bg-light p-5">
         <h1 class="display-3">Анализатор страниц</h1>
         <p class="lead">Бесплатно проверяйте сайты на SEO пригодность</p>
-        <?php if (!isset($error)) { ?>
+        <?php if (!isset($error)) : ?>
         <form action="/urls" method="post" class="row" required>
             <div class="col-8">
             <label for="text" class="visually-hidden">Url для проверки</label>
@@ -55,22 +55,29 @@
                 <input type="submit" class="btn btn-primary btn-lg ms-3 px-5 text-uppercase mx-3" value="Проверить">
             </div>
         </form>
-        <?php } ?>
-        <?php if (isset($error)) { ?>
-            <form action="/urls" method="post" class="row" required="">
-            <div class="col-8">
-            <label for="text" class="visually-hidden">Url для проверки</label>
-            <input type="text" name="url[name]" value=<?= $url->getName() ?> class="form-control form-control-lg is-invalid" placeholder="https://www.example.com">
-                        <div class="invalid-feedback">
-            Некорректный URL
-            </div>
-                        </div>
+        <?php endif ?>
+        <?php if (isset($error)) : ?>
+            <form action="/urls" method="post" class="row" required>
+                <div class="col-8">
+                    <label for="text" class="visually-hidden">Url для проверки</label>
+                    <?php switch ($url->getName() == null) : 
+                        case true : ?>
+                            <input type="text" name="url[name]" value="" class="form-control form-control-lg is-invalid" placeholder="https://www.example.com">
+                        <?php break ?>
+                        <?php case false : ?>
+                            <input type="text" name="url[name]" value=<?= $url->getName() ?> class="form-control form-control-lg is-invalid" placeholder="https://www.example.com">
+                        <?php break ?>
+                    <?php endswitch ?>
+                    <div class="invalid-feedback">
+                        <?= $error ?>
+                    </div>
+                </div>
             <div class="col-2">
                 <input type="submit" class="btn btn-primary btn-lg ms-3 px-5 text-uppercase mx-3" value="Проверить">
             </div>
 
         </form>
-        <?php } ?>
+        <?php endif ?>
 
     </div>
 </div>

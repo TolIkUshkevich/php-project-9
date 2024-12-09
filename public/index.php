@@ -66,7 +66,10 @@ $app->post('/urls', function ($request, $response) use ($repo, $router, $rendere
     $urlData = $formData['url'];
     $url = new Url($urlData['name']);
     $validator = new Validator(['name' => $url->getName()]);
-    $validator->rule('url', 'name');
+    $validator->rules([
+        'url' => 'name',
+        'required' => 'name'
+    ]);
     if ($validator->validate()) {
         $status = $repo->save($url);
         $message = $flashMap[$status];
@@ -75,7 +78,7 @@ $app->post('/urls', function ($request, $response) use ($repo, $router, $rendere
         return $response->withRedirect($route);
     } else {
         $params = [
-            'error' => 'wrong url',
+            'error' => $url->getName() !== "" ? 'Некорректный URL' : 'URL не должен быть пустым',
             'url' => $url
         ];
         return $renderer->render($response, 'main.phtml', $params);
@@ -101,19 +104,15 @@ $app->post('/urls/{id}/checks', function ($request, $response, $args) use ($repo
 });
 
 $app->get('/urls/{id}', function ($request, $response, $args) use ($repo, $renderer, $checkRepo, $app) {
-    $flashKeys = [
-        'success',
-        'warning',
-        'danger'
-    ];
     $id = (int)$args['id'];
     $url = $repo->find($id);
-    $flash = $this->get('flash')->getMessages();
-    // foreach ($flashKeys as $key) {
-    //     if ($this->get('flash')->getMessage($key)) {
-    //         $flash = [$key, ...$this->get('flash')->getMessage($key)];
-    //     }
-    // }
+    $flashArray = $this->get('flash')->getMessages();
+    if ($flashArray !== []) {
+        $flashStatus = array_key_first($flashArray);
+        $flash = [$flashStatus, $flashArray[$flashStatus][0]];
+    } else {
+        $flash = null;
+    }
     $checks = $checkRepo->getChecksForUrl($url);
     $params = [
         'url' => $url,
