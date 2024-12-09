@@ -40,7 +40,7 @@ class UrlRepository
         return null;
     }
 
-    public function findByUrl(Url $url): array | false
+    public function findByUrl(Url $url): array | null
     {
         $urlName = $url->getName();
         $sql = "SELECT * FROM urls WHERE name = ?";
