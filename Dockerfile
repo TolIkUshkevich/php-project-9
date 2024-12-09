@@ -12,6 +12,6 @@ WORKDIR /app
 
 COPY . .
 
-RUN composer install
+RUN make install
 
 CMD ["bash", "-c", "make start"]
