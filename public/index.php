@@ -85,7 +85,7 @@ $app->post('/urls', function ($request, $response) use ($repo, $router, $rendere
     }
 })->setName('post_url');
 
-$app->post('/urls/{id}/checks', function ($request, $response, $args) use ($repo, $checkRepo, $router, $app) {
+$app->post('/urls/{id}/checks', function ($request, $response, $args) use ($repo, $checkRepo, $router, $app, $renderer) {
     $map = [
         'success' => 'Страница успешно проверена',
         'warning' => 'Проверка была выполнена успешно, но сервер ответил с ошибкой',
@@ -97,6 +97,8 @@ $app->post('/urls/{id}/checks', function ($request, $response, $args) use ($repo
     $checkStatus = $check->check($url);
     if ($checkStatus === 'success') {
         $checkRepo->create($check);
+    } elseif ($checkStatus === 'fatal') {
+        return $renderer->render($response, 'fatal-error.phtml');
     }
     $this->get('flash')->addMessage($checkStatus, $map[$checkStatus]);
     $route = $router->urlFor('url', ['id' => $id]);
