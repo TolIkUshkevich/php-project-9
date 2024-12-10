@@ -140,8 +140,6 @@ class Check
             $document = new Document((string)$body);
             $urlId = $url->getId();
             $statusCode = $response->getStatusCode();
-            var_dump($statusCode);
-            die;
             $h1 = optional($document->first('h1'))->text();
             $title = optional($document->first('title'))->text();
             $description = optional($document->xpath("//meta[@name='description']/@content"))[0];
