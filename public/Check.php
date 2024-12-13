@@ -143,8 +143,6 @@ class Check
             $h1 = optional($document->first('h1'))->text();
             $title = optional($document->first('title'))->text();
             $description = optional($document->xpath("//meta[@name='description']/@content"))[0];
-            var_dump($document->xpath("//meta[@name='description']/@content"));
-            die;
             $this->setUrlId($urlId);
             $this->setH1($h1);
             $this->setBody(htmlspecialchars($body));
