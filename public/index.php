@@ -27,7 +27,7 @@ $app = AppFactory::createFromContainer($container);
 $renderer = new PhpRenderer(__DIR__ . '/../templates');
 $router = $app->getRouteCollector()->getRouteParser();
 
-$initFilePath = __DIR__ . '/../init.sql';
+$initFilePath = __DIR__ . '/../database.sql';
 $initSql = file_get_contents($initFilePath);
 $container->get(\PDO::class)->exec($initSql);
 $conn = $container->get(\PDO::class);
