@@ -81,7 +81,7 @@ $app->post('/urls', function ($request, $response) use ($repo, $router, $rendere
             'error' => $url->getName() !== "" ? 'Некорректный URL' : 'URL не должен быть пустым',
             'url' => $url
         ];
-        return $renderer->render($response->setstatus(422), 'main.phtml', $params);
+        return $renderer->render($response->setStatus(422), 'main.phtml', $params);
     }
 })->setName('post_url');
 
