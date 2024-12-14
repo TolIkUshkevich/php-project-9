@@ -11,10 +11,10 @@ class Check
     private Client $client;
     private int $id;
     private string $urlId;
-    private string $h1;
+    private string|null $h1;
     private int $statusCode;
-    private string $description;
-    private string $title;
+    private string|null $description;
+    private string|null $title;
     private string $createdAt;
 
     public function __construct()
@@ -69,7 +69,7 @@ class Check
         return $this->urlId;
     }
 
-    public function setH1(string $h1): void
+    public function setH1(string|null $h1): void
     {
         $this->h1 = $h1;
     }
@@ -89,7 +89,7 @@ class Check
         return $this->statusCode;
     }
 
-    public function setDescription(string $description): void
+    public function setDescription(string|null $description): void
     {
         $this->description = $description;
     }
@@ -100,7 +100,7 @@ class Check
         return $this->description;
     }
 
-    public function setTitle(string $title): void
+    public function setTitle(string|null $title): void
     {
         $this->title = $title;
     }
