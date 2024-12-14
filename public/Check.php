@@ -8,22 +8,21 @@ use DiDom\Document;
 
 class Check
 {
-    private $client;
-    private $id;
-    private $urlId;
-    private $h1;
-    private $body;
-    private $statusCode;
-    private $description;
-    private $title;
-    private $createdAt;
+    private Client $client;
+    private int $id;
+    private string $urlId;
+    private string $h1;
+    private int $statusCode;
+    private string $description;
+    private string $title;
+    private string $createdAt;
 
     public function __construct()
     {
         $this->client = new Client(['base_uri' => '']);
     }
 
-    public static function fromArray(array|false $params): check
+    public static function fromArray(array|false $params): Check
     {
         $map = [
             'id' => fn($check, $id) => $check->setId($id),
@@ -50,7 +49,7 @@ class Check
         return $check;
     }
 
-    public function setId($id): void
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
@@ -60,7 +59,7 @@ class Check
         return $this->id;
     }
 
-    public function setUrlId($urlId): void
+    public function setUrlId(int $urlId): void
     {
         $this->urlId = $urlId;
     }
@@ -70,7 +69,7 @@ class Check
         return $this->urlId;
     }
 
-    public function setH1($h1): void
+    public function setH1(string $h1): void
     {
         $this->h1 = $h1;
     }
@@ -80,17 +79,7 @@ class Check
         return $this->h1;
     }
 
-    public function setBody($body): void
-    {
-        $this->body = $body;
-    }
-
-    public function getBody(): string | null
-    {
-        return $this->body;
-    }
-
-    public function setStatusCode($statusCode): void
+    public function setStatusCode(int $statusCode): void
     {
         $this->statusCode = $statusCode;
     }
@@ -100,7 +89,7 @@ class Check
         return $this->statusCode;
     }
 
-    public function setDescription($description): void
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -111,7 +100,7 @@ class Check
         return $this->description;
     }
 
-    public function setTitle($title): void
+    public function setTitle(string $title): void
     {
         $this->title = $title;
     }
@@ -121,7 +110,7 @@ class Check
         return $this->title;
     }
 
-    public function setCreatedAt($createdAt): void
+    public function setCreatedAt(string $createdAt): void
     {
         $this->createdAt = $createdAt;
     }
@@ -134,7 +123,7 @@ class Check
     public function check(Url $url): string
     {
         $name = $url->getName();
-        try {
+        try {   
             $response = $this->client->get($name);
             $body = $response->getBody();
             $document = new Document((string)$body);

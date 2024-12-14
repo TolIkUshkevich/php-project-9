@@ -25,12 +25,12 @@ class Url
         ];
     }
 
-    public function __construct($name)
+    public function __construct(string $name)
     {
         $this->name = $name;
     }
 
-    public function setId($id): void
+    public function setId(string $id): void
     {
         $this->id = $id;
     }
@@ -40,7 +40,7 @@ class Url
         return $this->id;
     }
 
-    public function setCreatedAt($time): void
+    public function setCreatedAt(string $time): void
     {
         $this->createdAt = $time;
     }
