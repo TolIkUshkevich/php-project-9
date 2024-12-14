@@ -75,13 +75,13 @@ $app->post('/urls', function ($request, $response) use ($repo, $router, $rendere
         $message = $flashMap[$status];
         $this->get('flash')->addMessage('success', $message);
         $route = $router->urlFor('url', ['id' => $url->getId()]);
-        return $response->withRedirect($route);
+        return $response->withRedirect($route, 302);
     } else {
         $params = [
             'error' => $url->getName() !== "" ? 'Некорректный URL' : 'URL не должен быть пустым',
             'url' => $url
         ];
-        return $renderer->render($response, 'main.phtml', $params);
+        return $renderer->render($response->setstatus(422), 'main.phtml', $params);
     }
 })->setName('post_url');
 
