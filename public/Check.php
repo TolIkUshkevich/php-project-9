@@ -134,7 +134,6 @@ class Check
             $description = optional($document->xpath("//meta[@name='description']/@content"))[0];
             $this->setUrlId($urlId);
             $this->setH1($h1);
-            $this->setBody(htmlspecialchars($body));
             $this->setStatusCode((int)$statusCode);
             $this->setDescription($description);
             $this->setTitle($title);
