@@ -11,11 +11,11 @@ class Check
     private Client $client;
     private int $id;
     private string $urlId;
-    private string|null $h1;
-    private int $statusCode;
-    private string|null $description;
-    private string|null $title;
-    private string $createdAt;
+    private string|null $h1 = null;
+    private int|null $statusCode = null;
+    private string|null $description = null;
+    private string|null $title = null;
+    private string|null $createdAt = null;
 
     public function __construct()
     {
@@ -45,7 +45,7 @@ class Check
                 $map[$key]($check, $value);
             }
         }
-
+    
         return $check;
     }
 
