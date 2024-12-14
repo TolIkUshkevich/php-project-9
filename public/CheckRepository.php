@@ -36,7 +36,7 @@ class CheckRepository
         $statusCode = $check->getStatusCode();
         $h1 = $check->getH1();
         $title = $check->getTitle();
-        $description = $check->getBody();
+        $description = $check->getDescription();
         $stmt->bindParam(':url_id', $urlId);
         $stmt->bindParam(':status_code', $statusCode);
         $stmt->bindParam(':h1', $h1);
