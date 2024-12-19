@@ -94,7 +94,7 @@ class Check
         $this->description = $description;
     }
 
-    public function getDescription(): string
+    public function getDescription(): string | null
     {
 
         return $this->description;
