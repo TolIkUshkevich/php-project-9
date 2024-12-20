@@ -35,6 +35,7 @@ $repo = new UrlRepository($conn);
 $checkRepo = new CheckRepository($conn);
 
 $app->get('/', function ($request, $response) use ($renderer) {
+    $params = [];
     if ($request->getParam('error') !== null) {
         $error = $request->getParam('error');
         $url = $request->getParam('url');
@@ -42,8 +43,6 @@ $app->get('/', function ($request, $response) use ($renderer) {
             'error' => $error,
             'url' => $url
         ];
-    } else {
-        $params = [];
     }
     return $renderer->render($response, 'main.phtml', $params);
 })->setName('main');
@@ -74,7 +73,7 @@ $app->post('/urls', function ($request, $response) use ($repo, $router, $rendere
         $status = $repo->save($url);
         $message = $flashMap[$status];
         $this->get('flash')->addMessage('success', $message);
-        $route = $router->urlFor('url', ['id' => $url->getId()]);
+        $route = $router->urlFor('url', ['id' => (string)$url->getId()]);
         return $response->withRedirect($route, 302);
     } else {
         $params = [
@@ -98,16 +97,19 @@ $app->post('/urls/{id}/checks', function ($request, $response, $args) use ($repo
     if ($checkStatus === 'success') {
         $checkRepo->create($check);
     } elseif ($checkStatus === 'fatal') {
-        return $renderer->render($response, 'fatal-error.phtml');
+        return $renderer->render($response->withStatus(505), 'fatal-error.phtml');
     }
     $this->get('flash')->addMessage($checkStatus, $map[$checkStatus]);
     $route = $router->urlFor('url', ['id' => $id]);
-    return $response->withRedirect($route);
-});
+    return $response->withRedirect($route, 302);
+})->setName('post_check');
 
 $app->get('/urls/{id}', function ($request, $response, $args) use ($repo, $renderer, $checkRepo, $app) {
     $id = (int)$args['id'];
     $url = $repo->find($id);
+    if ($url === null) {
+        return $renderer->render($response->withStatus(404), 'not-found.phtml');
+    }
     $flashArray = $this->get('flash')->getMessages();
     if ($flashArray !== []) {
         $flashStatus = array_key_first($flashArray);
