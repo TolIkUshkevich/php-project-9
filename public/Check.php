@@ -45,7 +45,7 @@ class Check
                 $map[$key]($check, $value);
             }
         }
-    
+
         return $check;
     }
 
@@ -123,7 +123,7 @@ class Check
     public function check(Url $url): string
     {
         $name = $url->getName();
-        try {   
+        try {
             $response = $this->client->get($name);
             $body = $response->getBody();
             $document = new Document((string)$body);
