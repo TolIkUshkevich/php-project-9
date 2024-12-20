@@ -11,7 +11,7 @@ class PsqlConnection
      */
     public function connect(): \PDO
     {
-        if (getenv('DATABASE_URL') === null) {
+        if (getenv('DATABASE_URL') === false) {
             throw new \Exception("Error reading database configuration file");
         } else {
             $databaseUrl = parse_url(getenv('DATABASE_URL'));

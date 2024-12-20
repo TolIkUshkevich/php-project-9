@@ -4,9 +4,9 @@ namespace App;
 
 class Url
 {
-    private $name;
-    private $id;
-    private $createdAt;
+    private string $name;
+    private int $id;
+    private string $createdAt;
 
     public static function fromArray(array $params): Url
     {
