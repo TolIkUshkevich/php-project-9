@@ -93,6 +93,9 @@ $app->post('/urls/{id}/checks', function ($request, $response, $args) use ($repo
     $check = new Check();
     $id = $args['id'];
     $url = $repo->find($id);
+    if (!$url) {
+        return $renderer->render($response->withStatus(402), 'fatal-error.phtml')
+    }
     $checkStatus = $check->check($url);
     if ($checkStatus === 'success') {
         $checkRepo->create($check);

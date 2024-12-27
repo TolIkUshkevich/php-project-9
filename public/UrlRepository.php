@@ -6,9 +6,9 @@ use Carbon\Carbon;
 
 class UrlRepository
 {
-    private \PDO|null $conn;
+    private \PDO $conn;
 
-    public function __construct(\PDO|null $conn)
+    public function __construct(\PDO $conn)
     {
         $this->conn = $conn;
     }
@@ -71,10 +71,12 @@ class UrlRepository
     private function setExistsUrlData(Url $url): void
     {
         $urlData = $this->findByUrl($url);
-        $id = (int)$urlData['id'];
-        $created_at = $urlData['created_at'];
-        $url->setId($id);
-        $url->setCreatedAt($created_at);
+        if ($urlData) {
+            $id = (int)$urlData['id'];
+            $created_at = $urlData['created_at'];
+            $url->setId($id);
+            $url->setCreatedAt($created_at);
+        }
     }
 
     private function create(Url $url): void

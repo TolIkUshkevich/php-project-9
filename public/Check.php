@@ -59,9 +59,9 @@ class Check
         return $this->id;
     }
 
-    public function setUrlId(string $urlId): void
+    public function setUrlId(int $urlId): void
     {
-        $this->urlId = (int)$urlId;
+        $this->urlId = $urlId;
     }
 
     public function getUrlId(): string
