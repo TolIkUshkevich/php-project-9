@@ -6,9 +6,9 @@ use Carbon\Carbon;
 
 class CheckRepository
 {
-    private \PDO $conn;
+    private \PDO|null $conn;
 
-    public function __construct(\PDO $conn)
+    public function __construct(\PDO|null $conn)
     {
         $this->conn = $conn;
     }
