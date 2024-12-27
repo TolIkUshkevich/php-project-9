@@ -7,7 +7,7 @@ class PsqlConnection
     public function connect(): \PDO
     {
         if (getenv('DATABASE_URL') === false) {
-            throw new \Exception;
+            throw new \Exception();
         } else {
             $databaseUrl = parse_url(getenv('DATABASE_URL'));
             $conStr = sprintf(
