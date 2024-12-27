@@ -32,7 +32,7 @@ class Url
 
     public function setId(string $id): void
     {
-        $this->id = $id;
+        $this->id = (int)$id;
     }
 
     public function getId(): int

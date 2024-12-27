@@ -56,7 +56,7 @@ $app->get('/urls', function ($request, $response) use ($repo, $renderer, $checkR
     return $renderer->render($response, 'urls.phtml', $params);
 })->setName('urls');
 
-$app->post('/urls', function ($request, $response) use ($repo, $router, $renderer, $app) {
+$app->post('/urls', function ($request, $response) use ($repo, $router, $renderer) {
     $flashMap = [
         'new' => 'Страница успешно добавлена',
         'exists' => 'Страница уже существует'
@@ -84,7 +84,7 @@ $app->post('/urls', function ($request, $response) use ($repo, $router, $rendere
     }
 })->setName('post_url');
 
-$app->post('/urls/{id}/checks', function ($request, $response, $args) use ($repo, $checkRepo, $router, $app, $renderer) {
+$app->post('/urls/{id}/checks', function ($request, $response, $args) use ($repo, $checkRepo, $router, $renderer) {
     $map = [
         'success' => 'Страница успешно проверена',
         'warning' => 'Проверка была выполнена успешно, но сервер ответил с ошибкой',
@@ -104,7 +104,7 @@ $app->post('/urls/{id}/checks', function ($request, $response, $args) use ($repo
     return $response->withRedirect($route, 302);
 })->setName('post_check');
 
-$app->get('/urls/{id}', function ($request, $response, $args) use ($repo, $renderer, $checkRepo, $app) {
+$app->get('/urls/{id}', function ($request, $response, $args) use ($repo, $renderer, $checkRepo) {
     $id = (int)$args['id'];
     $url = $repo->find($id);
     if ($url === null) {

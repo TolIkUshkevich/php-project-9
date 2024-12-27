@@ -4,14 +4,10 @@ namespace App;
 
 class PsqlConnection
 {
-    /**
-     * Connect to the database and return an instance of \PDO object
-     * @return \PDO|null
-     */
     public function connect(): \PDO
     {
         if (getenv('DATABASE_URL') === false) {
-            return null;
+            throw new \Exception;
         } else {
             $databaseUrl = parse_url(getenv('DATABASE_URL'));
             $conStr = sprintf(

@@ -10,7 +10,7 @@ class Check
 {
     private Client $client;
     private int $id;
-    private string $urlId;
+    private int $urlId;
     private string|null $h1 = null;
     private int|null $statusCode = null;
     private string|null $description = null;
