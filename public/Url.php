@@ -30,9 +30,9 @@ class Url
         $this->name = $name;
     }
 
-    public function setId(string $id): void
+    public function setId(int $id): void
     {
-        $this->id = (int)$id;
+        $this->id = $id;
     }
 
     public function getId(): int
