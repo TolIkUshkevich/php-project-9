@@ -11,6 +11,11 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+      - run: composer install
       - run: make lint
       - name: List files in the repository
         run: |
