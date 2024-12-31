@@ -18,7 +18,7 @@ $container->set('flash', function () {
     return new Messages();
 });
 
-$app =AppFactory ::createFromContainer($container);
+$app = AppFactory::createFromContainer($container);
 $renderer = new PhpRenderer(__DIR__ . '/../templates');
 $router = $app->getRouteCollector()->getRouteParser();
 
@@ -27,9 +27,6 @@ $container->set(\PDO::class, function () {
     $conn = $connecter->connect();
     return $conn;
 });
-$initFilePath = __DIR__ . '/../database.sql';
-$initSql = file_get_contents($initFilePath);
-$container->get(\PDO::class)->exec($initSql);
 $conn = $container->get(\PDO::class);
 $repo = new UrlRepository($conn);
 $checkRepo = new CheckRepository($conn);

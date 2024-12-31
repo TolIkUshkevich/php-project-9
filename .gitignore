@@ -1,3 +1,2 @@
 /vendor/
-logs
-db
+.DS_Store
