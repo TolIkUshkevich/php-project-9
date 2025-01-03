@@ -68,7 +68,7 @@ $app->post('/urls', function ($request, $response) use ($repo, $router, $rendere
     ]);
     if ($validator->validate()) {
         $status = $repo->save($url);
-        $message = $flashMap[$status];      
+        $message = $flashMap[$status];
         $this->get('flash')->addMessage('success', $message);
         $route = $router->urlFor('url', ['id' => (string)$url->getId()]);
         return $response->withRedirect($route, 302);

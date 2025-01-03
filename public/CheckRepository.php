@@ -30,7 +30,8 @@ class CheckRepository
 
     public function create(Check $check): void
     {
-        $sql = "INSERT INTO url_checks (url_id, status_code, h1, title, description, created_at) VALUES (:url_id, :status_code, :h1, :title, :description, NOW())";
+        $sql = "INSERT INTO url_checks (url_id, status_code, h1, title, description, created_at)
+        VALUES (:url_id, :status_code, :h1, :title, :description, NOW())";
         $stmt = $this->conn->prepare($sql);
         $urlId = $check->getUrlId();
         $statusCode = $check->getStatusCode();
