@@ -33,8 +33,7 @@ $checkRepo = new CheckRepository($conn);
 
 $app->get('/', function ($request, $response) use ($renderer) {
     $params = [];
-    if ($request->getParam('error') !== null) {
-        $error = $request->getParam('error');
+    if ($error = $request->getParam('error') !== null) {
         $url = $request->getParam('url');
         $params = [
             'error' => $error,
